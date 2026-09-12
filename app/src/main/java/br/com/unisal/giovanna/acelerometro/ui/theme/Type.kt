@@ -1,4 +1,4 @@
-package br.com.unisal.gustavo.acelerometro.ui.theme
+package br.com.unisal.giovanna.acelerometro.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

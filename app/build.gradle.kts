@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "br.com.unisal.gustavo.acelerometro"
+    namespace = "br.com.unisal.giovanna.acelerometro"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "br.com.unisal.gustavo.acelerometro"
+        applicationId = "br.com.unisal.giovanna.acelerometro"
         minSdk = 24
         targetSdk = 37
         versionCode = 1

@@ -1,4 +1,4 @@
-package br.com.unisal.gustavo.acelerometro
+package br.com.unisal.giovanna.acelerometro
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("br.com.unisal.gustavo.acelerometro", appContext.packageName)
+        assertEquals("br.com.unisal.giovanna.acelerometro", appContext.packageName)
     }
 }

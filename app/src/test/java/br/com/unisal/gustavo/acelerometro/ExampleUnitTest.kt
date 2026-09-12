@@ -1,4 +1,4 @@
-package br.com.unisal.gustavo.acelerometro
+package br.com.unisal.giovanna.acelerometro
 
 import org.junit.Test
 
