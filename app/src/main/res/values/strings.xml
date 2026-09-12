@@ -1,12 +1,3 @@
 <resources>
-    <string name="app_name">Acelerômetro</string>
-    <string name="screen_subtitle">Leitura em tempo real</string>
-    <string name="linear_acceleration_label">Aceleração linear</string>
-    <string name="gravity_label">Gravidade</string>
-    <string name="axes_section_title">Valores por eixo</string>
-    <string name="unit_hint">Todos os valores são medidos em m/s² (metros por segundo ao quadrado).</string>
-    <string name="sensor_unavailable_message">Este dispositivo não possui um sensor de acelerômetro disponível.</string>
-    <string name="motion_status_rest">Repouso</string>
-    <string name="motion_status_light">Movimento leve</string>
-    <string name="motion_status_intense">Movimento intenso</string>
+    <string name="app_name">Acelerometro</string>
 </resources>
