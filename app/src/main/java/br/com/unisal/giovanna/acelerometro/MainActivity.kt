@@ -8,10 +8,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,13 +16,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,23 +42,21 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 
-// Constantes de configuração
-
 private const val FILTRO_ALPHA = 0.8f
 
 private const val LIMITE_MOVIMENTO_LEVE = 0.5f
 private const val LIMITE_MOVIMENTO_INTENSO = 3f
 
-// Paleta em tons de roxo
-private val RoxoEixoX = Color(0xFF7C4DFF)     
-private val RoxoEixoY = Color(0xFF9575CD)     
-private val RoxoEixoZ = Color(0xFFB39DDB)     
-private val RoxoGravidade = Color(0xFF512DA8) 
-private val RoxoRepouso = Color(0xFFB39DDB)   
-private val RoxoLeve = Color(0xFF7E57C2)      
-private val RoxoIntenso = Color(0xFF4527A0)   
+// cores em tons de roxo 
+private val RoxoEixoX = Color(0xFF7C4DFF)
+private val RoxoEixoY = Color(0xFF9575CD)
+private val RoxoEixoZ = Color(0xFFB39DDB)
+private val RoxoGravidade = Color(0xFF512DA8)
+private val RoxoRepouso = Color(0xFFB39DDB)
+private val RoxoLeve = Color(0xFF7E57C2)
+private val RoxoIntenso = Color(0xFF4527A0)
 
-//Guarda a última leitura do acelerômetro para ser exibida na tela.
+// guarda a ultima leitura do sensor pra mostrar na tela
 private data class LeituraAcelerometro(
     val eixoX: Float = 0f,
     val eixoY: Float = 0f,
@@ -80,10 +71,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     private var sensorManager: SensorManager? = null
     private var sensor: Sensor? = null
 
-    // Vetor de gravidade 
+    // vetor de gravidade
     private val gravidade = FloatArray(3)
 
-    // Estado observado pela UI: sempre que ele muda, a tela é redesenhada
+    // toda vez que muda, a tela atualiza sozinha
     private var leitura by mutableStateOf(LeituraAcelerometro())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,7 +84,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         sensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-        // Se o aparelho não tiver o sensor, mostra erro
+        // se o celular nao tiver o sensor, erro
         if (sensor == null) {
             leitura = leitura.copy(sensorDisponivel = false)
         }
@@ -116,7 +107,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Não precisamos reagir a mudanças de precisão do sensor.
+        // Criada apenas para passar como parametro
     }
 
     override fun onSensorChanged(evento: SensorEvent?) {
@@ -144,12 +135,12 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         )
     }
 
-    // Calcula o módulo (tamanho) de um vetor 3D: raiz(x² + y² + z²).
+    // calcula o tamanho do vetor (x, y, z)
     private fun magnitude(x: Float, y: Float, z: Float): Float =
         sqrt(x.pow(2) + y.pow(2) + z.pow(2))
 }
 
-// Interface gráfica (Jetpack Compose)
+//tela em Compose
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -179,78 +170,50 @@ private fun TelaAcelerometro(leitura: LeituraAcelerometro) {
             return@Scaffold
         }
 
-        Column(
+        // todos os valores num cartão só, um embaixo do outro
+        ElevatedCard(
             modifier = Modifier
                 .padding(paddingInterno)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(16.dp)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(4.dp))
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                LinhaDeValor(
+                    titulo = "Aceleração linear",
+                    valor = leitura.aceleracaoLinear,
+                    cor = corDoMovimento(leitura.aceleracaoLinear)
+                )
+                LinhaDeValor(titulo = "Gravidade", valor = leitura.gravidade, cor = RoxoGravidade)
 
-            // ---- Maior destaque: os dois valores calculados a partir dos eixos ----
-            // Um único cartão largo, com as duas linhas empilhadas e apenas
-            // uma linha divisória entre elas (em vez de dois cartões lado a lado).
-            ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    LinhaDeMagnitude(
-                        titulo = "Aceleração linear",
-                        valor = leitura.aceleracaoLinear,
-                        cor = corDoMovimento(leitura.aceleracaoLinear)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp))
-                    LinhaDeMagnitude(
-                        titulo = "Gravidade",
-                        valor = leitura.gravidade,
-                        cor = RoxoGravidade
-                    )
-                }
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                LinhaDeValor(titulo = "Eixo X", valor = leitura.eixoX, cor = RoxoEixoX)
+                LinhaDeValor(titulo = "Eixo Y", valor = leitura.eixoY, cor = RoxoEixoY)
+                LinhaDeValor(titulo = "Eixo Z", valor = leitura.eixoZ, cor = RoxoEixoZ)
             }
-
-            // valor bruto de cada eixo 
-            Text(
-                text = "Eixos",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                CartaoDeEixo(modifier = Modifier.weight(1f), nome = "X", valor = leitura.eixoX, cor = RoxoEixoX)
-                CartaoDeEixo(modifier = Modifier.weight(1f), nome = "Y", valor = leitura.eixoY, cor = RoxoEixoY)
-                CartaoDeEixo(modifier = Modifier.weight(1f), nome = "Z", valor = leitura.eixoZ, cor = RoxoEixoZ)
-            }
-
-            Text(
-                text = "Valores em m/s²",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
 
+//Plus: Apenas para a questão de UI
 private fun corDoMovimento(magnitude: Float): Color = when {
     magnitude < LIMITE_MOVIMENTO_LEVE -> RoxoRepouso
     magnitude < LIMITE_MOVIMENTO_INTENSO -> RoxoLeve
     else -> RoxoIntenso
 }
 
-/**
- * Uma linha larga e horizontal usada dentro do cartão de destaque:
- * título de um lado e o valor numérico do outro.
- */
+// título de um lado, valor do outro
 @Composable
-private fun LinhaDeMagnitude(
+private fun LinhaDeValor(
     titulo: String,
     valor: Float,
     cor: Color,
     modifier: Modifier = Modifier
 ) {
-    // A cor anima suavemente entre leituras: um feedback visual simples de
-    // que o valor foi atualizado, sem precisar de barras ou gráficos.
-    val corAnimada by animateColorAsState(targetValue = cor, label = "cor_$titulo")
-
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -265,65 +228,21 @@ private fun LinhaDeMagnitude(
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 text = String.format(Locale.getDefault(), "%.2f", valor),
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = corAnimada
+                color = cor
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "m/s²",
                 style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(bottom = 4.dp)
+                modifier = Modifier.padding(bottom = 3.dp)
             )
         }
     }
 }
 
-//Cartão simples usado para cada eixo (X, Y, Z): nome do eixo, valor numérico
-
-@Composable
-private fun CartaoDeEixo(
-    nome: String,
-    valor: Float,
-    cor: Color,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Bolinha colorida ajuda a identificar cada eixo
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .background(color = cor, shape = CircleShape)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "Eixo $nome",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = String.format(Locale.getDefault(), "%.2f", valor),
-                style = MaterialTheme.typography.titleLarge
-            )
-            Text(
-                text = "m/s²",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-//Mensagem exibida quando o aparelho não possui sensor de acelerômetro
+// aparece quando o aparelho nao tem acelerômetro
 @Composable
 private fun MensagemSensorIndisponivel(modifier: Modifier = Modifier) {
     Column(
